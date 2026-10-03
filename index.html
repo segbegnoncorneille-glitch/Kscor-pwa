@@ -1,0 +1,908 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GESTION FACILE KSCOR V8.58 - 80mm</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1e40af">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="KSCOR">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" sizes="512x512" href="icon-512.png">
+<style>
+body{font-family:Arial, sans-serif; padding:0; margin:0; background:#f1f5f9}
+h2{background:#1e40af; color:white; padding:12px; text-align:center; margin:0; position:relative}
+.badge-essai{position:absolute; right:10px; top:15px; font-size:10px; background:#f59e0b; padding:3px 8px; border-radius:10px; font-weight:bold; color:white}
+.tab{display:flex; position:sticky; top:0; z-index:99}
+.tab button{padding:14px; width:25%; border:none; background:#cbd5e1; cursor:pointer; font-weight:bold; font-size:13px}
+.tab button.active{background:#1e40af; color:white}
+.page{display:none; padding:10px}
+.page.active{display:block}
+.section{background:white; padding:12px; margin:10px 0; border-radius:10px; box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+h3{color:#1e40af; margin:0 0 8px 0}
+.filtre-vente{display:flex; gap:5px; margin-bottom:10px}
+.filtre-vente button{flex:1; padding:10px; border:none; border-radius:6px; background:#e2e8f0; font-weight:bold; font-size:13px; cursor:pointer}
+.filtre-vente button.active{background:#16a34a; color:white}
+#selectDateJour{display:none; margin-bottom:10px}
+.filtre-histo{display:flex; gap:5px; margin-bottom:10px; flex-wrap:wrap}
+.filtre-histo input{flex:1; min-width:120px}
+input{width:100%; padding:10px; margin:6px 0; border:1px solid #cbd5e1; border-radius:6px; box-sizing:border-box; font-size:14px}
+button.add{background:#16a34a; color:white; padding:12px; border:none; border-radius:6px; width:100%; margin-top:8px; font-weight:bold; font-size:15px; cursor:pointer}
+button.recharge{background:#f59e0b; color:white; padding:5px 8px; border:none; border-radius:5px; font-size:12px; cursor:pointer}
+button.supprimer{background:#ef4444; color:white; padding:5px 8px; border:none; border-radius:5px; font-size:12px; cursor:pointer}
+button.annuler{background:#ef4444; color:white; padding:4px 8px; border:none; border-radius:5px; font-size:11px; font-weight:bold; cursor:pointer}
+button.recu{background:#2563eb; color:white; padding:4px 8px; border:none; border-radius:5px; font-size:11px; font-weight:bold; margin-right:3px; cursor:pointer}
+button.param{background:#6366f1; color:white; padding:10px; border:none; border-radius:6px; width:100%; margin-top:8px; font-weight:bold; font-size:14px; cursor:pointer}
+button.panier{background:#0ea5e9; color:white; padding:10px; border:none; border-radius:6px; width:100%; margin-top:5px; font-weight:bold; cursor:pointer}
+table{width:100%; background:white; border-collapse:collapse; margin-top:8px; font-size:11px}
+th{background:#e2e8f0; padding:6px} th,td{border:1px solid #cbd5e1; padding:6px; text-align:center}
+.total{font-weight:bold; background:#fef9c3}
+.benef{font-weight:bold; background:#dcfce7; color:#166534}
+.alerte{color:white; background:#ef4444; font-weight:bold}
+#modalCode{position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:none; justify-content:center; align-items:center; z-index:999}
+#modalCode div{background:white; padding:20px; border-radius:10px; width:80%; max-width:300px; text-align:center}
+.infos-ets{background:#1e40af; color:white; padding:15px; border-radius:10px; text-align:center; margin-bottom:10px}
+.infos-ets h3{color:white; margin:5px 0}
+.panier-item{display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid #eee; font-size:13px}
+#popupRecu{position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:none; z-index:1000; overflow-y:auto}
+.recu-contenu{width:80mm; background:white; margin:20px auto; font-family:'Courier New', Courier, monospace; font-size:12px; padding:6mm; box-shadow:0 0 10px rgba(0,0,0,0.5); box-sizing:border-box}
+.recu-btns{position:sticky; bottom:0; background:#1e40af; padding:10px; display:flex; gap:5px; max-width:80mm; margin:0 auto}
+.recu-btns button{flex:1; padding:10px; border:none; border-radius:5px; color:white; font-weight:bold; cursor:pointer}
+#popupLicence{position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); display:none; justify-content:center; align-items:center; z-index:9999}
+#popupLicence div{background:white; padding:20px; border-radius:10px; width:90%; max-width:380px; text-align:center; max-height:90vh; overflow-y:auto}
+#popupLicence h2{color:#ef4444; background:none; padding:0; font-size:18px}
+#popupPrivacy{position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:none; justify-content:center; align-items:center; z-index:10000}
+#popupPrivacy div{background:white; padding:20px; border-radius:10px; width:90%; max-width:350px; text-align:center}
+.jours-expire{font-size:16px; font-weight:bold; color:#ef4444; margin:10px 0}
+.recu-table{width:100%; margin:8px 0; border-collapse:collapse}
+.recu-table th, .recu-table td{border:none; border-bottom:1px dashed #ccc; padding:4px 0; text-align:left; font-size:11px}
+.recu-table td.num{text-align:right}
+</style>
+</head>
+<body>
+
+
+<div id="popupPrivacy">
+  <div>
+    <h3 style="color:#1e40af">Politique de confidentialité</h3>
+    <p style="font-size:13px; text-align:left">GESTION FACILE stocke vos données uniquement sur votre téléphone. Aucune donnée n'est envoyée sur internet.<br><br>En cliquant sur Accepter, vous acceptez notre <a href="privacy.html" target="_blank">politique complète</a>.</p>
+    <button class="add" onclick="accepterPrivacy()">ACCEPTER</button>
+    <button class="add" style="background:#6b7280" onclick="refuserPrivacy()">REFUSER</button>
+  </div>
+</div>
+
+
+<div id="popupLicence">
+  <div>
+    <h2>🔒 PÉRIODE D'ESSAI TERMINÉE</h2>
+    <p>Vos 21 jours offerts sont terminés</p>
+    <p class="jours-expire">Abonnement requis pour continuer</p>
+    <button class="add" style="background:#4285F4" onclick="acheterAbonnementPlay()">S'ABONNER VIA GOOGLE PLAY</button>
+    <p style="margin-top:12px; font-size:12px"><a href="privacy.html" target="_blank">Politique de confidentialité</a></p>
+  </div>
+</div>
+
+
+<h2>GESTION FACILE KSCOR V8.58<span id="compteurEssai" class="badge-essai" style="display:none"></span></h2>
+<div class="tab">
+  <button class="tablinks active" onclick="openTab('Ventes', this)">VENTES</button>
+  <button class="tablinks" onclick="verifierCodeStock()">STOCK</button>
+  <button class="tablinks" onclick="openTab('Parametres', this)">PARAMÈTRES</button>
+  <button class="tablinks" onclick="openTab('Historique', this)">HISTORIQUE</button>
+</div>
+
+
+<div id="modalCode">
+  <div>
+    <h3>CODE D'ACCÈS STOCK</h3>
+    <input type="password" id="inputCode" placeholder="Tape le code">
+    <button class="add" onclick="ouvrirStock()">VALIDER</button>
+    <button style="background:#6b7280; margin-top:5px" class="add" onclick="fermerModal()">ANNULER</button>
+  </div>
+</div>
+
+
+<!-- PAGE VENTES -->
+<div id="Ventes" class="page active">
+  <div class="filtre-vente">
+    <button class="active" onclick="setFiltreVente('jour', this)">Jour</button>
+    <button onclick="setFiltreVente('semaine', this)">Semaine</button>
+    <button onclick="setFiltreVente('mois', this)">Mois</button>
+    <button onclick="setFiltreVente('annee', this)">Année</button>
+  </div>
+  <input type="date" id="selectDateJour">
+  
+  <div class="section">
+    <h3>NOUVELLE VENTE - PANIER</h3>
+    <input type="date" id="dateVente">
+    <input list="listeProduits" id="produitVente" placeholder="Tape pour chercher un produit..." onchange="remplirPrixEtBenef()">
+    <datalist id="listeProduits"></datalist>
+    <div style="display:flex; gap:5px">
+      <input type="number" id="qteVente" placeholder="Qté" value="1">
+      <input type="number" id="prixVente" placeholder="Prix Vente">
+      <input type="number" id="benefVente" placeholder="Bénéfice Unit.">
+    </div>
+    <button class="panier" onclick="ajouterAuPanier()">+ AJOUTER AU PANIER</button>
+    
+    <div id="zonePanier" style="display:none; margin-top:10px">
+      <h4 style="margin:5px 0">Panier en cours: <span id="totalPanier" style="color:#16a34a">0 F</span></h4>
+      <div id="listePanier"></div>
+      <button class="add" onclick="validerVentePanier()">✓ VALIDER LA VENTE</button>
+      <button style="background:#6b7280" class="add" onclick="viderPanier()">VIDER PANIER</button>
+    </div>
+  </div>
+
+
+  <div class="section">
+    <h3 id="titreTableau">VENTES (JOUR)</h3>
+    <table id="tableVentesFiltre"></table>
+  </div>
+
+
+  <div class="section">
+    <h3>RÉSUMÉ</h3>
+    <table>
+      <tr class="total"><td id="titreResume">Chiffre d'Affaires Jour</td><td id="caResume">0 F</td></tr>
+      <tr class="benef"><td id="titreBenef">BÉNÉFICE JOUR</td><td id="benefResume">0 F</td></tr>
+      <tr><td id="titreNb">Nombre de Ventes</td><td id="nbResume">0</td></tr>
+    </table>
+  </div>
+</div>
+
+
+<!-- PAGE STOCK -->
+<div id="Stock" class="page">
+  <div class="section">
+    <h3>AJOUTER / MODIFIER PRODUIT</h3>
+    <input type="text" id="nomProduit" placeholder="Nom du produit">
+    <div style="display:flex; gap:5px">
+      <input type="number" id="stockAjout" placeholder="Quantité à ajouter">
+      <input type="number" id="prixDefaut" placeholder="Prix Vente">
+      <input type="number" id="benefDefaut" placeholder="Bénéfice Unit.">
+    </div>
+    <button class="add" onclick="ajouterProduit()">+ ENREGISTRER / RECHARGER</button>
+  </div>
+  <div class="section">
+    <h3>ÉTAT DU STOCK</h3>
+    <div style="font-weight:bold; color:#1e40af; margin-bottom:5px">Total Produits distincts: <span id="totalProduits">0</span></div>
+    <table id="tableStock"></table>
+  </div>
+</div>
+
+
+<!-- PAGE PARAMETRES -->
+<div id="Parametres" class="page">
+  <div class="section">
+    <h3>INFORMATIONS DE L'ÉTABLISSEMENT</h3>
+    <label style="font-size:12px">Nom ETS:</label>
+    <input type="text" id="nomEts">
+    <label style="font-size:12px">Téléphone:</label>
+    <input type="text" id="telEts">
+    <label style="font-size:12px">Adresse / Ville:</label>
+    <input type="text" id="adresseEts">
+    <button class="add" onclick="saveInfosEts()">💾 ENREGISTRER INFOS ETS</button>
+  </div>
+  <div class="section">
+    <h3>SAUVEGARDE & RESTAURATION</h3>
+    <button class="add" style="background:#2563eb" onclick="exporterDonnees()">📤 EXPORTER MES DONNÉES (SAUVEGARDE)</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importerDonnees(event)">
+    <button class="add" style="background:#f59e0b" onclick="document.getElementById('importFile').click()">📥 IMPORTER MES DONNÉES</button>
+    <p><small style="color:#64748b">Conseil: Exporter périodiquement vos données pour ne pas les perdre.</small></p>
+  </div>
+  <div class="section">
+    <h3>SÉCURITÉ & ABONNEMENT</h3>
+    <button class="param" onclick="changerCode()">🔒 CHANGER LE CODE D'ACCÈS STOCK</button>
+    <button class="add" style="background:#4285F4; margin-top:10px" onclick="acheterAbonnementPlay()">💳 GÉRER MON ABONNEMENT GOOGLE PLAY</button>
+  </div>
+  <p style="text-align:center; margin-top:15px; font-size:12px"><a href="privacy.html" target="_blank">Politique de confidentialité</a></p>
+</div>
+
+
+<!-- PAGE HISTORIQUE -->
+<div id="Historique" class="page">
+  <div class="section infos-ets" id="infosEtsAffichage"></div>
+  <div class="section">
+    <h3>RECHERCHE & FILTRE</h3>
+    <div class="filtre-histo">
+      <input type="text" id="searchHisto" placeholder="🔍 Chercher produit..." onkeyup="afficherHisto()">
+      <input type="date" id="dateDebut" onchange="afficherHisto()">
+      <input type="date" id="dateFin" onchange="afficherHisto()">
+    </div>
+  </div>
+  <div class="section">
+    <h3>HISTORIQUE DES VENTES & REÇUS</h3>
+    <table id="tableVentesTout"></table>
+  </div>
+</div>
+
+
+<!-- POPUP RECU THERMIQUE 80MM -->
+<div id="popupRecu">
+  <div class="recu-contenu" id="contenuRecu"></div>
+  <div class="recu-btns">
+    <button style="background:#2563eb" onclick="imprimerRecu()">🖨️ IMPRIMER (RAWBT)</button>
+    <button style="background:#25D366" onclick="partagerWhatsApp()">📲 WHATSAPP</button>
+    <button style="background:#6b7280" onclick="fermerPopupRecu()">✖ FERMER</button>
+  </div>
+</div>
+
+
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})});
+}
+
+
+const GOOGLE_PLAY_PRODUCT_ID = "kscor_cle_licence_full";
+
+
+let JOURS_ESSAI = 21;
+let CODE_STOCK = localStorage.getItem('code_stock_V58GF') || "1234";
+let stock = JSON.parse(localStorage.getItem('stock_V58GF')) || [];
+let ventes = JSON.parse(localStorage.getItem('ventes_V58GF')) || [];
+let panier = [];
+let infosEts = JSON.parse(localStorage.getItem('infos_ets_V58GF')) || {nom:"ETS KSCOR", tel:"+229 01 67087123", adresse:"COTONOU - BENIN"};
+let compteurRecu = parseInt(localStorage.getItem('compteur_recu_V58GF')) || 1;
+let venteEnCoursRecu = null; 
+let filtreVenteActif = 'jour';
+
+
+function checkPrivacy(){
+  if(!localStorage.getItem('privacy_accepte_V58GF')){
+    document.getElementById('popupPrivacy').style.display='flex';
+    return false;
+  }
+  return true;
+}
+
+
+function accepterPrivacy(){
+  localStorage.setItem('privacy_accepte_V58GF','true');
+  document.getElementById('popupPrivacy').style.display='none';
+  if(checkLicence()) initApp();
+}
+
+
+function refuserPrivacy(){
+  alert("Vous devez accepter la politique de confidentialité pour utiliser l'application.");
+}
+
+
+function checkLicence(){
+  let dateInstall = localStorage.getItem('date_install_V58GF');
+  if(!dateInstall){
+    dateInstall = new Date().getTime();
+    localStorage.setItem('date_install_V58GF', dateInstall);
+  }
+  
+  let diffJours = Math.floor((new Date().getTime() - parseInt(dateInstall)) / (1000 * 60 * 60 * 24));
+  let joursRestants = JOURS_ESSAI - diffJours;
+  let abonne = localStorage.getItem('abonnement_play_actif') === "true";
+  
+  if(abonne){
+    document.getElementById('popupLicence').style.display='none';
+    document.getElementById('compteurEssai').style.display='inline-block';
+    document.getElementById('compteurEssai').style.background='#16a34a';
+    document.getElementById('compteurEssai').innerText = `ABONNÉ`;
+    return true;
+  }
+  
+  if(joursRestants > 0){
+    document.getElementById('popupLicence').style.display='none';
+    document.getElementById('compteurEssai').style.display='inline-block';
+    document.getElementById('compteurEssai').style.background='#f59e0b';
+    document.getElementById('compteurEssai').innerText = `ESSAI J-${joursRestants}`;
+    return true;
+  }
+  
+  document.getElementById('popupLicence').style.display='flex';
+  return false;
+}
+
+
+async function acheterAbonnementPlay(){
+  if (!('getDigitalGoodsService' in window)) {
+    alert("Veuillez ouvrir l'application installée depuis le Google Play Store pour vous abonner.");
+    return;
+  }
+
+
+  try {
+    const service = await window.getDigitalGoodsService('https://play.google.com/billing');
+    const details = await service.getDetails([GOOGLE_PLAY_PRODUCT_ID]);
+
+
+    if (!details || details.length === 0) {
+      alert("Abonnement actuellement indisponible. Veuillez réessayer plus tard.");
+      return;
+    }
+
+
+    const paymentMethods = [{
+      supportedMethods: 'https://play.google.com/billing',
+      data: { sku: GOOGLE_PLAY_PRODUCT_ID }
+    }];
+
+
+    const paymentDetails = {
+      total: {
+        label: details[0].title,
+        amount: { currency: details[0].price.currency, value: details[0].price.value }
+      }
+    };
+
+
+    const request = new PaymentRequest(paymentMethods, paymentDetails);
+    const response = await request.show();
+    
+    const token = response.details.token;
+    await service.consume(token); 
+    await response.complete('success');
+
+
+    localStorage.setItem('abonnement_play_actif', 'true');
+    alert("Votre abonnement via Google Play a été activé avec succès !");
+    checkLicence();
+    initApp();
+
+
+  } catch (err) {
+    console.error("Erreur Google Play Billing:", err);
+    alert("Transaction annulée ou non complétée.");
+  }
+}
+
+
+window.onload = function(){
+  if(!checkPrivacy()) return;
+  if(checkLicence()) initApp();
+};
+
+
+function initApp(){
+  let today = new Date().toISOString().split('T')[0];
+  document.getElementById('dateVente').value = today;
+  document.getElementById('selectDateJour').value = today;
+  document.getElementById('dateDebut').value = today.substring(0,8) + "01";
+  document.getElementById('dateFin').value = today;
+  document.getElementById('selectDateJour').onchange = afficher;
+  afficher();
+}
+
+
+function formatDateJJMMAAAA(d){
+  if(!d) return "";
+  let p = d.split('-');
+  return `${p[2]}/${p[1]}/${p[0]}`;
+}
+
+
+function save(){
+  localStorage.setItem('stock_V58GF', JSON.stringify(stock));
+  localStorage.setItem('ventes_V58GF', JSON.stringify(ventes));
+  localStorage.setItem('code_stock_V58GF', CODE_STOCK);
+  localStorage.setItem('infos_ets_V58GF', JSON.stringify(infosEts));
+  localStorage.setItem('compteur_recu_V58GF', compteurRecu);
+}
+
+
+function exporterDonnees(){
+  let data = {stock, ventes, infosEts, compteur:compteurRecu, code:CODE_STOCK};
+  let b = new Blob([JSON.stringify(data)], {type:"application/json"});
+  let u = URL.createObjectURL(b);
+  let a = document.createElement("a");
+  a.href = u;
+  a.download = "SAUVEGARDE_KSCOR_" + new Date().toISOString().split('T')[0] + ".json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+
+function importerDonnees(e){
+  let f = e.target.files[0];
+  if(!f) return;
+  let r = new FileReader();
+  r.onload = function(ev){
+    try{
+      let d = JSON.parse(ev.target.result);
+      if(!confirm("⚠️ Attention: Cela remplacera toutes vos données actuelles. Continuer?")) return;
+      stock = d.stock || [];
+      ventes = d.ventes || [];
+      infosEts = d.infosEts || infosEts;
+      compteurRecu = d.compteur || 1;
+      CODE_STOCK = d.code || "1234";
+      save();
+      afficher();
+      if(document.getElementById('Historique').classList.contains('active')) afficherHisto();
+      alert("Restauration réussie !");
+    }catch(err){
+      alert("Fichier de sauvegarde invalide.");
+    }
+  };
+  r.readAsText(f);
+}
+
+
+function saveInfosEts(){
+  infosEts.nom = document.getElementById('nomEts').value.trim() || "ETS KSCOR";
+  infosEts.tel = document.getElementById('telEts').value.trim();
+  infosEts.adresse = document.getElementById('adresseEts').value.trim();
+  save();
+  afficher();
+  alert("Informations de l'établissement enregistrées !");
+}
+
+
+function changerCode(){
+  let a = prompt("Ancien code d'accès:");
+  if(a !== CODE_STOCK) return alert("Code actuel incorrect !");
+  let n = prompt("Nouveau code:");
+  if(!n) return;
+  let c = prompt("Confirmer le nouveau code:");
+  if(n !== c) return alert("Les codes ne correspondent pas !");
+  CODE_STOCK = n;
+  save();
+  alert("Code d'accès modifié avec succès !");
+}
+
+
+function verifierCodeStock(){
+  document.getElementById('modalCode').style.display='flex';
+  document.getElementById('inputCode').value = '';
+}
+
+
+function fermerModal(){
+  document.getElementById('modalCode').style.display='none';
+}
+
+
+function ouvrirStock(){
+  if(document.getElementById('inputCode').value === CODE_STOCK){
+    openTab('Stock', document.querySelectorAll('.tablinks')[1]);
+    fermerModal();
+  } else {
+    alert("CODE INCORRECT !");
+  }
+}
+
+
+function openTab(n, el){
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".tablinks").forEach(b => b.classList.remove("active"));
+  document.getElementById(n).classList.add("active");
+  if(el) el.classList.add("active");
+  
+  if(n === 'Parametres'){
+    document.getElementById('nomEts').value = infosEts.nom;
+    document.getElementById('telEts').value = infosEts.tel;
+    document.getElementById('adresseEts').value = infosEts.adresse;
+  }
+  if(n === 'Historique') afficherHisto();
+}
+
+
+function setFiltreVente(t, b){
+  filtreVenteActif = t;
+  document.querySelectorAll('.filtre-vente button').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  document.getElementById('selectDateJour').style.display = (t === 'jour') ? 'block' : 'none';
+  afficher();
+}
+
+
+function ajouterProduit(){
+  let n = document.getElementById('nomProduit').value.trim();
+  let q = +document.getElementById('stockAjout').value || 0;
+  let p = +document.getElementById('prixDefaut').value || 0;
+  let b = +document.getElementById('benefDefaut').value || 0;
+  
+  if(!n) return alert("Veuillez saisir le nom du produit.");
+  
+  let item = stock.find(x => x.nom.toLowerCase() === n.toLowerCase());
+  if(item){
+    item.initial += q;
+    if(p > 0) item.prix = p;
+    if(b > 0) item.benef = b;
+  } else {
+    stock.push({nom: n, initial: q, vendu: 0, prix: p, benef: b});
+  }
+  save();
+  afficher();
+  document.getElementById('nomProduit').value = "";
+  document.getElementById('stockAjout').value = "";
+  document.getElementById('prixDefaut').value = "";
+  document.getElementById('benefDefaut').value = "";
+  alert("Produit mis à jour dans le stock !");
+}
+
+
+function rechargerDirect(i){
+  let q = prompt("Quantité à ajouter au stock pour " + stock[i].nom + " :");
+  if(q && !isNaN(q) && +q > 0){
+    stock[i].initial += +q;
+    save();
+    afficher();
+  }
+}
+
+
+function supprimerProduit(i){
+  let p = stock[i];
+  if(p.vendu > 0){
+    if(!confirm(`Attention: Ce produit a déjà été vendu (${p.vendu} fois). Le supprimer annulera l'historique de stock associé. Supprimer quand même?`)) return;
+  } else {
+    if(!confirm("Supprimer " + p.nom + " du stock ?")) return;
+  }
+  stock.splice(i, 1);
+  save();
+  afficher();
+}
+
+
+function remplirPrixEtBenef(){
+  let n = document.getElementById('produitVente').value.trim();
+  let pr = stock.find(x => x.nom.toLowerCase() === n.toLowerCase());
+  if(pr){
+    if(pr.prix) document.getElementById('prixVente').value = pr.prix;
+    if(pr.benef) document.getElementById('benefVente').value = pr.benef;
+  }
+}
+
+
+function ajouterAuPanier(){
+  let q = +document.getElementById('qteVente').value || 0;
+  let p = +document.getElementById('prixVente').value || 0;
+  let b = +document.getElementById('benefVente').value || 0;
+  let n = document.getElementById('produitVente').value.trim();
+  
+  if(!n) return alert("Choisissez un produit");
+  if(q <= 0) return alert("La quantité doit être supérieure à 0");
+  
+  let pr = stock.find(x => x.nom.toLowerCase() === n.toLowerCase());
+  if(!pr) return alert("Produit introuvable dans le stock");
+  
+  let resteEnStock = pr.initial - pr.vendu;
+  let dejaDansPanier = panier.filter(x => x.nom === pr.nom).reduce((acc, current) => acc + current.qte, 0);
+  
+  if(resteEnStock - dejaDansPanier < q){
+    return alert(`Stock insuffisant ! Disponible: ${resteEnStock - dejaDansPanier}`);
+  }
+  
+  panier.push({
+    nom: pr.nom,
+    qte: q,
+    prix: p,
+    benef: b,
+    ca: q * p,
+    benefTotal: q * b
+  });
+  
+  afficherPanier();
+  document.getElementById('produitVente').value = "";
+  document.getElementById('qteVente').value = "1";
+  document.getElementById('prixVente').value = "";
+  document.getElementById('benefVente').value = "";
+}
+
+
+function afficherPanier(){
+  let zp = document.getElementById('zonePanier');
+  if(panier.length === 0){
+    zp.style.display = "none";
+    return;
+  }
+  zp.style.display = "block";
+  let h = "";
+  let t = 0;
+  panier.forEach((it, i) => {
+    t += it.ca;
+    h += `<div class="panier-item">
+      <span><b>${it.qte}x</b> ${it.nom} (${it.prix} F)</span>
+      <span><b>${it.ca} F</b> <button onclick="panier.splice(${i},1);afficherPanier()" style="background:#ef4444;color:white;border:none;border-radius:3px;padding:2px 6px;cursor:pointer">X</button></span>
+    </div>`;
+  });
+  document.getElementById('listePanier').innerHTML = h;
+  document.getElementById('totalPanier').innerText = t + " F";
+}
+
+
+function viderPanier(){
+  panier = [];
+  afficherPanier();
+}
+
+
+function validerVentePanier(){
+  if(panier.length === 0) return alert("Le panier est vide !");
+  
+  let dVente = document.getElementById('dateVente').value;
+  if(!dVente) return alert("Veuillez sélectionner une date de vente.");
+  
+  for(let it of panier){
+    let pr = stock.find(x => x.nom === it.nom);
+    if(!pr || (pr.initial - pr.vendu < it.qte)){
+      return alert("Stock insuffisant pour " + it.nom);
+    }
+  }
+  
+  panier.forEach(it => {
+    let pr = stock.find(x => x.nom === it.nom);
+    if(pr) pr.vendu += it.qte;
+  });
+  
+  let now = new Date();
+  let nouvelleVente = {
+    id: compteurRecu,
+    date: dVente,
+    heure: now.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'}),
+    articles: JSON.parse(JSON.stringify(panier)),
+    ca: panier.reduce((a, b) => a + b.ca, 0),
+    benef: panier.reduce((a, b) => a + b.benefTotal, 0)
+  };
+  
+  ventes.push(nouvelleVente);
+  let idGen = compteurRecu;
+  compteurRecu++;
+  save();
+  afficher();
+  viderPanier();
+  genererRecu(idGen);
+}
+
+
+function annulerVente(id){
+  if(!confirm("Êtes-vous sûr d'annuler et de supprimer cette vente N° " + id + " ? Le stock sera réintégré.")) return;
+  let v = ventes.find(x => x.id == id);
+  if(v){
+    v.articles.forEach(it => {
+      let p = stock.find(x => x.nom === it.nom);
+      if(p) p.vendu -= it.qte;
+    });
+    ventes = ventes.filter(x => x.id != id);
+    save();
+    afficher();
+    if(document.getElementById('Historique').classList.contains('active')) afficherHisto();
+  }
+}
+
+
+function afficherHisto(){
+  document.getElementById('infosEtsAffichage').innerHTML = `<h3>${infosEts.nom}</h3><div>${infosEts.tel}</div><div>${infosEts.adresse}</div>`;
+  let s = document.getElementById('searchHisto').value.toLowerCase();
+  let d1 = document.getElementById('dateDebut').value;
+  let d2 = document.getElementById('dateFin').value;
+  
+  let vt = "<tr><th>N° Ticket</th><th>Date / Heure</th><th>Articles</th><th>CA Total</th><th>Actions</th></tr>";
+  
+  let listeFiltree = ventes.filter(x => {
+    let matchProd = x.articles.some(a => a.nom.toLowerCase().includes(s));
+    let matchD1 = !d1 || x.date >= d1;
+    let matchD2 = !d2 || x.date <= d2;
+    return matchProd && matchD1 && matchD2;
+  });
+  
+  listeFiltree.reverse().forEach(x => {
+    let detailArt = x.articles.map(a => `${a.qte}x ${a.nom}`).join('<br>');
+    vt += `<tr>
+      <td><b>#${String(x.id).padStart(5, '0')}</b></td>
+      <td>${formatDateJJMMAAAA(x.date)}<br><small>${x.heure || ''}</small></td>
+      <td style="text-align:left">${detailArt}</td>
+      <td><b>${x.ca} F</b></td>
+      <td>
+        <button class="recu" onclick="genererRecu(${x.id})">REÇU</button>
+        <button class="annuler" onclick="annulerVente(${x.id})">X</button>
+      </td>
+    </tr>`;
+  });
+  
+  document.getElementById('tableVentesTout').innerHTML = vt;
+}
+
+
+function genererRecu(id){
+  venteEnCoursRecu = ventes.find(x => x.id == id);
+  if(!venteEnCoursRecu) return;
+  
+  let numTicket = String(venteEnCoursRecu.id).padStart(6, '0');
+  let html = `
+    <div style="text-align:center; font-weight:bold; font-size:14px">${infosEts.nom}</div>
+    <div style="text-align:center; font-size:11px">${infosEts.adresse}</div>
+    <div style="text-align:center; font-size:11px">TEL: ${infosEts.tel}</div>
+    <div style="border-bottom: 1px dashed #000; margin: 5px 0;"></div>
+    <div style="font-size:11px"><b>TICKET N°:</b> #${numTicket}</div>
+    <div style="font-size:11px"><b>DATE:</b> ${formatDateJJMMAAAA(venteEnCoursRecu.date)} ${venteEnCoursRecu.heure || ''}</div>
+    <div style="border-bottom: 1px dashed #000; margin: 5px 0;"></div>
+    
+    <table class="recu-table">
+      <thead>
+        <tr>
+          <th>ART</th>
+          <th class="num">QTE</th>
+          <th class="num">P.U</th>
+          <th class="num">TOTAL</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+  
+  venteEnCoursRecu.articles.forEach(a => {
+    html += `
+      <tr>
+        <td>${a.nom}</td>
+        <td class="num">${a.qte}</td>
+        <td class="num">${a.prix}</td>
+        <td class="num">${a.ca}</td>
+      </tr>
+    `;
+  });
+  
+  html += `
+      </tbody>
+    </table>
+    <div style="border-bottom: 1px dashed #000; margin: 5px 0;"></div>
+    <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:bold;">
+      <span>TOTAL NET:</span>
+      <span>${venteEnCoursRecu.ca} F</span>
+    </div>
+    <div style="border-bottom: 1px dashed #000; margin: 5px 0;"></div>
+    <div style="text-align:center; font-size:10px; margin-top:8px;">MERCI DE VOTRE VISITE !<br>A BIENTOT</div>
+  `;
+  
+  document.getElementById('contenuRecu').innerHTML = html;
+  document.getElementById('popupRecu').style.display = 'block';
+}
+
+
+function fermerPopupRecu(){
+  document.getElementById('popupRecu').style.display = 'none';
+}
+
+
+function imprimerRecu(){
+  if(!venteEnCoursRecu) return;
+  let numTicket = String(venteEnCoursRecu.id).padStart(6, '0');
+  
+  let text = "";
+  text += "================================\n";
+  text += "      " + infosEts.nom.toUpperCase() + "\n";
+  text += "  " + infosEts.adresse + "\n";
+  text += "  TEL: " + infosEts.tel + "\n";
+  text += "================================\n";
+  text += "TICKET N°: #" + numTicket + "\n";
+  text += "DATE: " + formatDateJJMMAAAA(venteEnCoursRecu.date) + " " + (venteEnCoursRecu.heure || '') + "\n";
+  text += "--------------------------------\n";
+  
+  venteEnCoursRecu.articles.forEach(a => {
+    text += a.nom + "\n";
+    text += "   " + a.qte + " x " + a.prix + " F = " + a.ca + " F\n";
+  });
+  
+  text += "--------------------------------\n";
+  text += "TOTAL A PAYER: " + venteEnCoursRecu.ca + " F\n";
+  text += "================================\n";
+  text += "    MERCI DE VOTRE VISITE !\n\n\n";
+
+
+  let S = encodeURIComponent(text);
+  window.location.href = "rawbt:base64," + btoa(unescape(encodeURIComponent(text)));
+}
+
+
+function partagerWhatsApp(){
+  if(!venteEnCoursRecu) return;
+  let t = `*${infosEts.nom}*\n*Ticket N°:* #${String(venteEnCoursRecu.id).padStart(6, '0')}\n*Date:* ${formatDateJJMMAAAA(venteEnCoursRecu.date)}\n---\n`;
+  venteEnCoursRecu.articles.forEach(a => {
+    t += `${a.qte}x ${a.nom} à ${a.prix}F = ${a.ca}F\n`;
+  });
+  t += `---\n*TOTAL: ${venteEnCoursRecu.ca} F*\nMerci de votre confiance !`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(t)}`, '_blank');
+}
+
+
+function obtnirDateDebutEtFinFiltre(){
+  let refDateStr = document.getElementById('selectDateJour').value || new Date().toISOString().split('T')[0];
+  let refDate = new Date(refDateStr);
+  let d1 = "", d2 = "";
+
+
+  if(filtreVenteActif === 'jour'){
+    d1 = refDateStr;
+    d2 = refDateStr;
+  } else if(filtreVenteActif === 'semaine'){
+    let day = refDate.getDay();
+    let diffToMonday = refDate.getDate() - day + (day === 0 ? -6 : 1);
+    let monday = new Date(refDate.setDate(diffToMonday));
+    let sunday = new Date(monday);
+    sunday.setDate(sunday.getDate() + 6);
+    d1 = monday.toISOString().split('T')[0];
+    d2 = sunday.toISOString().split('T')[0];
+  } else if(filtreVenteActif === 'mois'){
+    let y = refDate.getFullYear();
+    let m = String(refDate.getMonth() + 1).padStart(2, '0');
+    let lastDay = new Date(y, refDate.getMonth() + 1, 0).getDate();
+    d1 = `${y}-${m}-01`;
+    d2 = `${y}-${m}-${lastDay}`;
+  } else if(filtreVenteActif === 'annee'){
+    let y = refDate.getFullYear();
+    d1 = `${y}-01-01`;
+    d2 = `${y}-12-31`;
+  }
+  return {d1, d2};
+}
+
+
+function afficher(){
+  // --- TABLEAU DES STOCKS ---
+  let s = "<tr><th>Produit</th><th>Départ</th><th>Vendu</th><th>Reste</th><th>Prix</th><th>Action</th></tr>";
+  let tri = [...stock].sort((a, b) => a.nom.localeCompare(b.nom));
+  document.getElementById('totalProduits').innerText = tri.length;
+  
+  tri.forEach(x => {
+    let i = stock.findIndex(p => p.nom === x.nom);
+    let reste = x.initial - x.vendu;
+    s += `<tr>
+      <td style="text-align:left"><b>${x.nom}</b></td>
+      <td>${x.initial}</td>
+      <td>${x.vendu}</td>
+      <td ${reste < 3 ? 'class="alerte"' : ''}><b>${reste}</b></td>
+      <td>${x.prix || 0} F</td>
+      <td>
+        <button class="recharge" title="Recharger" onclick="rechargerDirect(${i})">+</button>
+        <button class="supprimer" title="Supprimer" onclick="supprimerProduit(${i})">X</button>
+      </td>
+    </tr>`;
+  });
+  document.getElementById('tableStock').innerHTML = s;
+  
+  let p = "";
+  tri.forEach(x => p += `<option value="${x.nom}"> Stock: ${x.initial - x.vendu}</option>`);
+  document.getElementById('listeProduits').innerHTML = p;
+
+
+  // --- TABLEAU DES VENTES (AVEC BOUTON REÇU ET ANNULER RESTAURÉS) ---
+  let bounds = obtnirDateDebutEtFinFiltre();
+  let totCA = 0;
+  let totBenef = 0;
+  let nbVentes = 0;
+  let vf = "<tr><th>Articles</th><th>Heure</th><th>Montant</th><th>Action</th></tr>";
+
+
+  let ventesFiltrees = ventes.filter(x => x.date >= bounds.d1 && x.date <= bounds.d2);
+
+
+  ventesFiltrees.forEach(x => {
+    totCA += x.ca;
+    totBenef += (x.benef || 0);
+    nbVentes++;
+    vf += `<tr>
+      <td style="text-align:left">${x.articles.map(a => `${a.qte}x${a.nom}`).join(', ')}</td>
+      <td><small>${x.heure || ''}</small></td>
+      <td><b>${x.ca} F</b></td>
+      <td>
+        <button class="recu" title="Imprimer Reçu" onclick="genererRecu(${x.id})">REÇU</button>
+        <button class="annuler" title="Annuler Vente" onclick="annulerVente(${x.id})">X</button>
+      </td>
+    </tr>`;
+  });
+
+
+  document.getElementById('tableVentesFiltre').innerHTML = vf;
+  document.getElementById('caResume').innerText = totCA + " F";
+  document.getElementById('benefResume').innerText = totBenef + " F";
+  document.getElementById('nbResume').innerText = nbVentes;
+
+
+  let lib = filtreVenteActif.toUpperCase();
+  document.getElementById('titreResume').innerText = "Chiffre d'Affaires (" + lib + ")";
+  document.getElementById('titreBenef').innerText = "BÉNÉFICE (" + lib + ")";
+  document.getElementById('titreTableau').innerText = "VENTES (" + lib + ")";
+}
+</script>
+</body>
+</html>

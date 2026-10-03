@@ -1,0 +1,24 @@
+﻿{
+  "short_name": "KSCOR",
+  "name": "KSCOR GESTION FACILE",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "./index.html",
+  "background_color": "#1e40af",
+  "theme_color": "#1e40af",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "./"
+}
