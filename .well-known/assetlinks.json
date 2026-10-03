@@ -2,7 +2,7 @@
       "relation": ["delegate_permission/common.handle_all_urls"],
       "target": {
         "namespace": "android_app",
-        "package_name": "io.github.segbegnoncorneille_glitch.twa",
-        "sha256_cert_fingerprints": ["20:25:08:67:16:EB:DB:23:38:53:BE:3F:D2:BF:01:70:53:C3:BA:16:73:41:B8:2D:02:A0:CC:2C:02:C3:43:51"]
+        "package_name": "com.kscor.gestionfacile",
+        "sha256_cert_fingerprints": ["D8:77:97:6C:E4:35:03:0F:42:C4:3B:44:15:FB:09:33:A2:39:E9:75:21:BC:A1:FD:B5:7D:5E:FA:A7:23:6B:22"]
       }
     }]
