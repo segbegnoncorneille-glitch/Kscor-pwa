@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.segbegnoncorneille_glitch.twa",
+        "sha256_cert_fingerprints": ["20:25:08:67:16:EB:DB:23:38:53:BE:3F:D2:BF:01:70:53:C3:BA:16:73:41:B8:2D:02:A0:CC:2C:02:C3:43:51"]
+      }
+    }]
